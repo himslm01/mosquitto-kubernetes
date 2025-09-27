@@ -12,6 +12,25 @@ spec:
       labels:
         app: mosquitto
     spec:
+      initContainers:
+        - name: install
+          image: mosquitto
+          imagePullPolicy: IfNotPresent
+          command: [
+              "cp",
+              "/mosquitto/tmp/mosquitto.conf",
+              "/mosquitto/tmp/password.txt",
+              "/mosquitto/config/"
+            ]
+          volumeMounts:
+            - name: workdir
+              mountPath: /mosquitto/config/
+            - name: config
+              mountPath: /mosquitto/tmp/mosquitto.conf
+              subPath: mosquitto.conf
+            - name: passwords
+              mountPath: /mosquitto/tmp/password.txt
+              subPath: password.txt
       containers:
         - name: mosquitto
           image: mosquitto
@@ -31,12 +50,8 @@ spec:
             - name: ws
               containerPort: 9001
           volumeMounts:
-            - name: config
-              mountPath: /mosquitto/config/mosquitto.conf
-              subPath: mosquitto.conf
-            - name: passwords
-              mountPath: /mosquitto/config/password.txt
-              subPath: password.txt
+            - name: workdir
+              mountPath: /mosquitto/config/
             - name: certs
               mountPath: /mosquitto/certs/
             - name: data
@@ -45,12 +60,16 @@ spec:
         - name: config
           configMap:
             name: mosquitto-config
+            defaultMode: 0400
         - name: passwords
           secret:
             secretName: mosquitto-password
+            defaultMode: 0400
         - name: certs
           secret:
             secretName: mosquitto-certs
         - name: data
           persistentVolumeClaim:
             claimName: mosquitto-data
+        - name: workdir
+          emptyDir: {}
