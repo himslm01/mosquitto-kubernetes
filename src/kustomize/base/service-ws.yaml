@@ -11,3 +11,8 @@ spec:
       port: 9001
       targetPort: ws
       protocol: TCP
+  sessionAffinity: None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: PreferDualStack

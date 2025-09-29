@@ -11,3 +11,8 @@ spec:
       port: 8883
       targetPort: mqtts
       protocol: TCP
+  sessionAffinity: None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
